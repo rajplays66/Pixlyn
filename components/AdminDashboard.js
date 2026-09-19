@@ -34,13 +34,13 @@ export default function AdminDashboard({ initialPosts, initialProfile }) {
           <LogoutButton />
         </div>
 
-        <a
+        
           href="/"
           target="_blank"
           rel="noreferrer"
           className="text-[13px] text-muted hover:text-ink -mt-3 transition-colors"
         >
-          View public profile ↗
+          View public profile
         </a>
 
         <UploadForm onPublished={handlePublished} notify={notify} />

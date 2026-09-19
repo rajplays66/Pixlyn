@@ -34,7 +34,7 @@ export default function AdminDashboard({ initialPosts, initialProfile }) {
           <LogoutButton />
         </div>
 
-        
+        <a
           href="/"
           target="_blank"
           rel="noreferrer"

@@ -29,7 +29,7 @@ export default function ProfileEditor({ initialProfile, notify }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(fields),
     });
-    if (!res.ok) throw new Error("Could not update profile.");
+    if (!res.ok) { const body = await res.json().catch(() => ({})); throw new Error(body.error || `Could not update profile (status ${res.status}).`); }
     const { profile: updated } = await res.json();
     setProfile(updated);
     return updated;

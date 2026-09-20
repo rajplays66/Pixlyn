@@ -24,3 +24,4 @@ export default function Toast({ message, type = "success", onDismiss }) {
     </div>
   );
 }
+ 

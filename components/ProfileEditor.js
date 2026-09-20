@@ -10,16 +10,14 @@ async function uploadImage(supabase, file, folder) {
     .from("pixlyn")
     .upload(path, file, { cacheControl: "3600", upsert: false });
   if (error) throw error;
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from("pixlyn").getPublicUrl(path);
+  const { data: { publicUrl } } = supabase.storage.from("pixlyn").getPublicUrl(path);
   return publicUrl;
 }
 
 export default function ProfileEditor({ initialProfile, notify }) {
   const supabase = createClient();
   const [profile, setProfile] = useState(
-    initialProfile || { email: "", bio: "", avatar_url: "", banner_url: "" }
+    initialProfile || { name: "", email: "", bio: "", avatar_url: "", banner_url: "", followers: "" }
   );
   const [busy, setBusy] = useState(false);
 
@@ -29,7 +27,10 @@ export default function ProfileEditor({ initialProfile, notify }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(fields),
     });
-    if (!res.ok) { const body = await res.json().catch(() => ({})); throw new Error(body.error || `Could not update profile (status ${res.status}).`); }
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || `Could not update profile (status ${res.status}).`);
+    }
     const { profile: updated } = await res.json();
     setProfile(updated);
     return updated;
@@ -69,7 +70,12 @@ export default function ProfileEditor({ initialProfile, notify }) {
     e.preventDefault();
     setBusy(true);
     try {
-      await patchProfile({ email: profile.email, bio: profile.bio });
+      await patchProfile({
+        name: profile.name,
+        email: profile.email,
+        bio: profile.bio,
+        followers: profile.followers,
+      });
       notify("Profile saved.", "success");
     } catch (err) {
       notify(err.message, "error");
@@ -80,58 +86,48 @@ export default function ProfileEditor({ initialProfile, notify }) {
 
   return (
     <div className="border border-hairline rounded-2xl p-4 sm:p-5 flex flex-col gap-4">
-      <p className="text-[13px] font-semibold text-muted uppercase tracking-wide">
-        Profile
-      </p>
+      <p className="text-[13px] font-semibold text-muted uppercase tracking-wide">Profile</p>
 
       <div className="flex items-center gap-4">
         <div className="w-16 h-16 rounded-full overflow-hidden bg-subtle border border-hairline shrink-0">
-          {profile.avatar_url && (
-            <img
-              src={profile.avatar_url}
-              alt="Avatar"
-              className="w-full h-full object-cover"
-            />
-          )}
+          {profile.avatar_url && <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />}
         </div>
         <label className="text-[13px] text-ink font-semibold cursor-pointer border border-hairline rounded-lg px-3 py-2">
           Change avatar
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleAvatarChange}
-            className="hidden"
-          />
+          <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
         </label>
       </div>
 
       <div className="flex flex-col gap-2">
         <div className="w-full h-20 rounded-lg overflow-hidden bg-subtle border border-hairline">
-          {profile.banner_url && (
-            <img
-              src={profile.banner_url}
-              alt="Banner"
-              className="w-full h-full object-cover"
-            />
-          )}
+          {profile.banner_url && <img src={profile.banner_url} alt="Banner" className="w-full h-full object-cover" />}
         </div>
         <label className="self-start text-[13px] text-ink font-semibold cursor-pointer border border-hairline rounded-lg px-3 py-2">
           Change banner
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleBannerChange}
-            className="hidden"
-          />
+          <input type="file" accept="image/*" onChange={handleBannerChange} className="hidden" />
         </label>
       </div>
 
       <form onSubmit={handleSaveText} className="flex flex-col gap-2.5">
         <input
+          type="text"
+          value={profile.name || ""}
+          onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+          placeholder="Name"
+          className="w-full border border-hairline rounded-xl px-4 py-2.5 text-[14.5px] outline-none focus:border-ink"
+        />
+        <input
           type="email"
           value={profile.email || ""}
           onChange={(e) => setProfile({ ...profile, email: e.target.value })}
           placeholder="Email"
+          className="w-full border border-hairline rounded-xl px-4 py-2.5 text-[14.5px] outline-none focus:border-ink"
+        />
+        <input
+          type="text"
+          value={profile.followers || ""}
+          onChange={(e) => setProfile({ ...profile, followers: e.target.value })}
+          placeholder="Followers (e.g. 1.5M)"
           className="w-full border border-hairline rounded-xl px-4 py-2.5 text-[14.5px] outline-none focus:border-ink"
         />
         <textarea
@@ -141,11 +137,7 @@ export default function ProfileEditor({ initialProfile, notify }) {
           rows={3}
           className="w-full border border-hairline rounded-xl px-4 py-2.5 text-[14.5px] outline-none focus:border-ink resize-none"
         />
-        <button
-          type="submit"
-          disabled={busy}
-          className="self-start bg-ink text-white rounded-xl px-5 py-2.5 text-[13.5px] font-semibold disabled:opacity-50"
-        >
+        <button type="submit" disabled={busy} className="self-start bg-ink text-white rounded-xl px-5 py-2.5 text-[13.5px] font-semibold disabled:opacity-50">
           Save profile
         </button>
       </form>

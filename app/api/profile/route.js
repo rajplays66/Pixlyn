@@ -11,7 +11,7 @@ export async function PATCH(request) {
 
   const body = await request.json();
   const updates = {};
-  for (const key of ["email", "bio", "avatar_url", "banner_url"]) {
+  for (const key of ["name", "email", "bio", "avatar_url", "banner_url", "followers"]) {
     if (typeof body[key] === "string") updates[key] = body[key];
   }
 

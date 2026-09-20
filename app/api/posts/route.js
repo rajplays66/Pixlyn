@@ -23,7 +23,7 @@ export async function POST(request) {
   }
 
   const body = await request.json();
-  const { image_url, caption } = body;
+  const { image_url, caption, likes } = body;
 
   if (!image_url) {
     return NextResponse.json({ error: "image_url is required." }, { status: 400 });
@@ -31,7 +31,7 @@ export async function POST(request) {
 
   const { data, error } = await supabase
     .from("posts")
-    .insert({ image_url, caption: caption || "" })
+    .insert({ image_url, caption: caption || "", likes: likes || "0" })
     .select()
     .single();
 

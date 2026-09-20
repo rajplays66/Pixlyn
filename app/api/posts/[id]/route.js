@@ -18,6 +18,7 @@ export async function PATCH(request, { params }) {
   const updates = {};
   if (typeof body.caption === "string") updates.caption = body.caption;
   if (typeof body.image_url === "string") updates.image_url = body.image_url;
+  if (typeof body.likes === "string") updates.likes = body.likes;
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "Nothing to update." }, { status: 400 });

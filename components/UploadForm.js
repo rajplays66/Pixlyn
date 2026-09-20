@@ -10,6 +10,7 @@ export default function UploadForm({ onPublished, notify }) {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [caption, setCaption] = useState("");
+  const [likes, setLikes] = useState("");
   const [progress, setProgress] = useState(0);
   const [busy, setBusy] = useState(false);
 
@@ -19,14 +20,15 @@ export default function UploadForm({ onPublished, notify }) {
     setFile(f);
     setPreviewUrl(URL.createObjectURL(f));
   }
-
-  function resetForm() {
+function resetForm() {
     setFile(null);
     setPreviewUrl(null);
     setCaption("");
+    setLikes("");
     setProgress(0);
     if (fileInputRef.current) fileInputRef.current.value = "";
-  }
+}
+  
 
   async function handlePublish(e) {
     e.preventDefault();
@@ -56,7 +58,7 @@ export default function UploadForm({ onPublished, notify }) {
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image_url: publicUrl, caption }),
+        body: JSON.stringify({ image_url: publicUrl, caption, likes: likes || "0" }),
       });
 
       if (!res.ok) {
@@ -118,6 +120,13 @@ export default function UploadForm({ onPublished, notify }) {
         rows={3}
         className="w-full border border-hairline rounded-xl px-4 py-3 text-[14.5px] outline-none focus:border-ink transition-colors resize-none"
       />
+       <input
+        type="text"
+        placeholder="Likes (e.g. 292k) — optional"
+        value={likes}
+        onChange={(e) => setLikes(e.target.value)}
+        className="w-full border border-hairline rounded-xl px-4 py-3 text-[14.5px] outline-none focus:border-ink transition-colors"
+      />   
 
       {progress > 0 && (
         <div className="w-full h-1.5 bg-hairline rounded-full overflow-hidden">

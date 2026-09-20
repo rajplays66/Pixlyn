@@ -11,7 +11,7 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen bg-white">
       <SiteHeader />
-      <ProfileHeader profile={profile} />
+      <ProfileHeader profile={profile} postCount={posts.length} />
       <div className="h-8 sm:h-10" />
       <PostGrid posts={posts} />
     </main>
